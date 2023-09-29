@@ -2,6 +2,8 @@ import pygame
 import sys
 import csv
 import os
+from peyetribe import EyeTribe
+
 # Função para exibir o trajeto selecionado com um círculo percorrendo-o
 def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista, ir_para_diagnostico):
     arquivo_selecionado = trajeto_selecionado
@@ -35,10 +37,16 @@ def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, v
 
     # Variáveis para rastrear a posição do círculo
     posicao_circulo = 0
-    velocidade_circulo = 1  # Ajuste a velocidade conforme necessário
+    velocidade_circulo = 3  # Ajuste a velocidade conforme necessário
     contador_frames = 0  # Contador de frames para controlar a velocidade
 
     isPlay = False
+
+    tracker = EyeTribe(host="localhost", port=6555)
+    tracker.connect()
+    n = [tracker.next()]
+    tracker.pushmode()
+
 
     while estado_da_tela == "trajeto_selecionado":
         for evento in pygame.event.get():
@@ -50,7 +58,7 @@ def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, v
                     isPlay = not isPlay  # Ativar o efeito de clique
                 elif texto_salvar_rect.collidepoint(evento.pos):
                     estado_da_tela = "diagnostico"
-                    ir_para_diagnostico()
+                    ir_para_diagnostico(n)
         # Preencha a tela com branco
         tela.fill(branco)
 
@@ -62,11 +70,13 @@ def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, v
             # Atualize a posição do círculo com base na velocidade
             if contador_frames % velocidade_circulo == 0:
                 posicao_circulo += 1
+                n.append(tracker.next())
 
             # Verifique se o círculo chegou ao final do trajeto
             if posicao_circulo >= len(trajeto_selecionado):
                 posicao_circulo = 0
                 isPlay = False
+                tracker.pullmode()
             
 
         # Desenhe o círculo vermelho na posição atual

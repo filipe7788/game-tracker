@@ -5,7 +5,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import io
 
-def exibir_diagnostico_tela(estado_da_tela, tela, voltar):
+def exibir_diagnostico_tela(estado_da_tela, tela, voltar, track):
     # Cores
     branco = (255, 255, 255)
     preto = (0, 0, 0)
@@ -13,6 +13,9 @@ def exibir_diagnostico_tela(estado_da_tela, tela, voltar):
 
     fonte = pygame.font.Font(None, 36)
     largura, altura = 1920, 1080
+
+    for i in track:
+        print(i[2])
 
     # Área do botão "Salvar"
     largura_botao_salvar = 200

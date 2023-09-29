@@ -24,7 +24,7 @@ fonte = pygame.font.Font(None, 36)
 
 # Variável para rastrear o estado da tela atual
 estado_da_tela = "menu"
-
+track_geral = None
 # Variável para rastrear a tela de percursos
 lista_de_percursos = []  # Lista para armazenar os percursos salvos
 percurso_selecionado = None  # Armazena o percurso selecionado
@@ -84,9 +84,10 @@ def selecionar_percurso(trajeto_selecionado_lista):
     estado_da_tela = "trajeto_selecionado"
     trajeto_selecionado = trajeto_selecionado_lista
 
-def ir_para_diagnostico():
-    global estado_da_tela
+def ir_para_diagnostico(track):
+    global estado_da_tela, track_geral
     estado_da_tela = "diagnostico"
+    track_geral = track
 
 # Função para exibir a tela de percursos
 def exibir_percursos():
@@ -100,8 +101,8 @@ def exibir_trajeto_selecionado():
     
 
 def exibir_diagnostico(): 
-    global tela, estado_da_tela   
-    exibir_diagnostico_tela(estado_da_tela, tela, voltar_ao_menu)
+    global tela, estado_da_tela, track_geral
+    exibir_diagnostico_tela(estado_da_tela, tela, voltar_ao_menu, track_geral)
 
 # Loop principal
 while True:
