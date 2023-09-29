@@ -24,18 +24,6 @@ fonte = pygame.font.Font(None, 36)
 # Variável para rastrear o estado da tela atual
 estado_da_tela = "menu"
 
-# Espaçamento entre os botões
-espaco_entre_botoes = 60
-
-# Área de desenho do trajeto
-area_desenho = pygame.Rect(0, 0, largura, altura - 100)  # Área acima do botão "Salvar"
-
-# Lista para armazenar os pontos desenhados
-pontos_desenhados = []
-
-# Variável para rastrear se o mouse está pressionado
-mouse_pressionado = False
-
 # Variável para rastrear a tela de percursos
 lista_de_percursos = []  # Lista para armazenar os percursos salvos
 percurso_selecionado = None  # Armazena o percurso selecionado

@@ -24,7 +24,7 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu):
 
     fonte = pygame.font.Font(None, 36)
     largura, altura = 1920, 1080
-    area_desenho = pygame.Rect(0, 0, largura, altura - 100)  # Área acima do botão "Salvar"
+    area_desenho = pygame.Rect(0, 0, largura, altura - 200)  # Área acima do botão "Salvar"
 
 
     # Área do botão "Salvar"
