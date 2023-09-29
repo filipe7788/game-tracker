@@ -1,27 +1,31 @@
 import pygame
 import sys
 import os
-
-largura, altura = 1920, 1080
-area_desenho = pygame.Rect(0, 0, largura, altura - 100)  # Área acima do botão "Salvar"
+import csv 
+import uuid
 
 # Lista para armazenar os pontos desenhados
-pontos_desenhados = []
-# Variável para rastrear se o mouse está pressionado
-mouse_pressionado = False
 
-# Cores
-branco = (255, 255, 255)
-preto = (0, 0, 0)
-vermelho = (255, 0, 0)
-
-fonte = pygame.font.Font(None, 36)
 
 # Função para exibir a tela de criação de percurso
-def exibir_criar_percurso(tela, salvar_trajeto, fonte):
-    global estado_da_tela, pontos_desenhados, mouse_pressionado
+def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu):
+    pontos_desenhados = []
 
     botao_salvar_clicado = False  # Inicializa a variável botao_salvar_clicado como False
+    # Variável para rastrear se o mouse está pressionado
+    mouse_pressionado = False
+
+    espaco_entre_botoes = 60
+
+    # Cores
+    branco = (255, 255, 255)
+    preto = (0, 0, 0)
+    vermelho = (255, 0, 0)
+
+    fonte = pygame.font.Font(None, 36)
+    largura, altura = 1920, 1080
+    area_desenho = pygame.Rect(0, 0, largura, altura - 100)  # Área acima do botão "Salvar"
+
 
     # Área do botão "Salvar"
     largura_botao_salvar = 200
@@ -34,9 +38,6 @@ def exibir_criar_percurso(tela, salvar_trajeto, fonte):
     altura_botao_voltar = 80
     x_botao_voltar = x_botao_salvar - largura_botao_voltar - espaco_entre_botoes  # Separados por 60 pixels
     y_botao_voltar = y_botao_salvar
-
-    espaco_entre_botoes = 60
-
 
     while estado_da_tela == "criar_percurso":
         for evento in pygame.event.get():
@@ -55,6 +56,7 @@ def exibir_criar_percurso(tela, salvar_trajeto, fonte):
                 # Verifique se o clique foi no botão "Voltar"
                 elif pygame.Rect(x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar).collidepoint(evento.pos):
                     estado_da_tela = "menu"  # Retorna à tela anterior (menu)
+                    voltar_ao_menu()
 
         # Desenhar o percurso enquanto o mouse está pressionado
         if mouse_pressionado:
@@ -90,3 +92,20 @@ def exibir_criar_percurso(tela, salvar_trajeto, fonte):
             salvar_trajeto(pontos_desenhados)
             pontos_desenhados = []  # Limpa a lista de pontos após salvar
             botao_salvar_clicado = False
+
+
+# Função para salvar os dados do trajeto em um arquivo CSV
+def salvar_trajeto(trajeto):
+    # Certifique-se de que a pasta "trajetos" existe ou a crie
+    if not os.path.exists("trajetos"):
+        os.mkdir("trajetos")
+
+    # Crie um nome de arquivo único usando UUID
+    nome_arquivo = os.path.join("trajetos", f"trajectory_{str(uuid.uuid4())[:8]}.csv")
+
+    # Salva os pontos do trajeto no arquivo CSV
+    with open(nome_arquivo, mode='w', newline='') as arquivo_csv:
+        writer = csv.writer(arquivo_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(["X", "Y"])  # Cabeçalho do CSV
+        for ponto in trajeto:
+            writer.writerow([ponto[0], ponto[1]])
