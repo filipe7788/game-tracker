@@ -3,7 +3,7 @@ import sys
 import csv
 import os
 # Função para exibir o trajeto selecionado com um círculo percorrendo-o
-def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista):
+def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista, ir_para_diagnostico):
     arquivo_selecionado = trajeto_selecionado
     # Cores
     branco = (255, 255, 255)
@@ -35,31 +35,39 @@ def exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, v
 
     # Variáveis para rastrear a posição do círculo
     posicao_circulo = 0
-    velocidade_circulo = 2  # Ajuste a velocidade conforme necessário
+    velocidade_circulo = 1  # Ajuste a velocidade conforme necessário
     contador_frames = 0  # Contador de frames para controlar a velocidade
+
+    isPlay = False
 
     while estado_da_tela == "trajeto_selecionado":
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif evento.type == pygame.KEYDOWN and evento.key == pygame.K_ESCAPE:
-                estado_da_tela = "percursos"
-
+            elif evento.type == pygame.MOUSEBUTTONUP and evento.button == 1:
+                if texto_voltar_rect.collidepoint(evento.pos):
+                    isPlay = not isPlay  # Ativar o efeito de clique
+                elif texto_salvar_rect.collidepoint(evento.pos):
+                    estado_da_tela = "diagnostico"
+                    ir_para_diagnostico()
         # Preencha a tela com branco
         tela.fill(branco)
 
         # Desenhe o trajeto selecionado
         for i in range(len(trajeto_selecionado) - 1):
-            pygame.draw.line(tela, vermelho, trajeto_selecionado[i], trajeto_selecionado[i + 1], 5)
+            pygame.draw.line(tela, vermelho, trajeto_selecionado[i], trajeto_selecionado[i + 1], 5)  
 
-        # Atualize a posição do círculo com base na velocidade
-        if contador_frames % velocidade_circulo == 0:
-            posicao_circulo += 1
+        if isPlay:
+            # Atualize a posição do círculo com base na velocidade
+            if contador_frames % velocidade_circulo == 0:
+                posicao_circulo += 1
 
-        # Verifique se o círculo chegou ao final do trajeto
-        if posicao_circulo >= len(trajeto_selecionado):
-            posicao_circulo = 0
+            # Verifique se o círculo chegou ao final do trajeto
+            if posicao_circulo >= len(trajeto_selecionado):
+                posicao_circulo = 0
+                isPlay = False
+            
 
         # Desenhe o círculo vermelho na posição atual
         pygame.draw.circle(tela, vermelho, trajeto_selecionado[posicao_circulo], 10)

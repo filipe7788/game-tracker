@@ -5,6 +5,7 @@ import os
 from criar_percurso import exibir_criar_percurso_tela
 from lista_de_percursos import exibir_lista_de_percursos
 from reproducao_de_percurso import exibir_trajeto_selecionado_tela
+from diagnostico import exibir_diagnostico_tela
 # Inicialize o Pygame
 pygame.init()
 
@@ -83,6 +84,10 @@ def selecionar_percurso(trajeto_selecionado_lista):
     estado_da_tela = "trajeto_selecionado"
     trajeto_selecionado = trajeto_selecionado_lista
 
+def ir_para_diagnostico():
+    global estado_da_tela
+    estado_da_tela = "diagnostico"
+
 # Função para exibir a tela de percursos
 def exibir_percursos():
     global estado_da_tela, lista_de_percursos, percurso_selecionado
@@ -90,9 +95,14 @@ def exibir_percursos():
 
 # Função para exibir o trajeto selecionado com um círculo percorrendo-o
 def exibir_trajeto_selecionado():
-    global estado_da_tela, trajeto_selecionado
-    exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista)
+    global tela, estado_da_tela, trajeto_selecionado
+    exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista, ir_para_diagnostico)
     
+
+def exibir_diagnostico(): 
+    global tela, estado_da_tela   
+    exibir_diagnostico_tela(estado_da_tela, tela, voltar_ao_menu)
+
 # Loop principal
 while True:
     if estado_da_tela == "menu":
@@ -103,3 +113,5 @@ while True:
         exibir_percursos()
     elif estado_da_tela == "trajeto_selecionado":
         exibir_trajeto_selecionado()
+    elif estado_da_tela == "diagnostico":
+        exibir_diagnostico()
