@@ -31,6 +31,10 @@ percurso_selecionado = None  # Armazena o percurso selecionado
 # Variável para armazenar o trajeto selecionado
 trajeto_selecionado = []
 
+def voltar_para_lista():
+    global estado_da_tela
+    estado_da_tela = "percursos"
+
 # Função para exibir o menu
 def exibir_menu():
     global estado_da_tela
@@ -87,7 +91,7 @@ def exibir_percursos():
 # Função para exibir o trajeto selecionado com um círculo percorrendo-o
 def exibir_trajeto_selecionado():
     global estado_da_tela, trajeto_selecionado
-    exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado)
+    exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista)
     
 # Loop principal
 while True:
