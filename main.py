@@ -1,11 +1,11 @@
 import pygame
 import sys
-import csv
-import os
 from criar_percurso import exibir_criar_percurso_tela
 from lista_de_percursos import exibir_lista_de_percursos
 from reproducao_de_percurso import exibir_trajeto_selecionado_tela
 from diagnostico import exibir_diagnostico_tela
+from salvar_percurso import salvar_percurso_tela
+
 # Inicialize o Pygame
 pygame.init()
 
@@ -73,10 +73,14 @@ def voltar_ao_menu():
     global estado_da_tela
     estado_da_tela = "menu"
 
+def ir_para_salvar():
+    global estado_da_tela
+    estado_da_tela = "salvar_percurso_tela"
+
 # Função para exibir a tela de criação de percurso
 def exibir_criar_percurso():
     global tela, estado_da_tela
-    exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu)
+    exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_salvar)
 
 
 def selecionar_percurso(trajeto_selecionado_lista):
@@ -98,11 +102,14 @@ def exibir_percursos():
 def exibir_trajeto_selecionado():
     global tela, estado_da_tela, trajeto_selecionado
     exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista, ir_para_diagnostico)
-    
 
 def exibir_diagnostico(): 
     global tela, estado_da_tela, track_geral
     exibir_diagnostico_tela(estado_da_tela, tela, voltar_ao_menu, track_geral)
+
+def exibir_salvar_trajeto():
+    global tela, estado_da_tela, trajeto_selecionado
+    salvar_percurso_tela(tela, estado_da_tela, trajeto_selecionado, voltar_ao_menu)
 
 # Loop principal
 while True:
@@ -116,3 +123,5 @@ while True:
         exibir_trajeto_selecionado()
     elif estado_da_tela == "diagnostico":
         exibir_diagnostico()
+    elif estado_da_tela == "salvar_percurso_tela":
+        exibir_salvar_trajeto()

@@ -1,15 +1,8 @@
 import pygame
-import sys
-import os
-import csv 
+import os, csv, sys
 
+def salvar_percurso_tela(tela, estado_da_tela, trajeto_selecionado, voltar_ao_menu):
 
-# Lista para armazenar os pontos desenhados
-
-
-# Função para exibir a tela de criação de percurso
-def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_salvar):
-    pontos_desenhados = []
 
     botao_salvar_clicado = False  # Inicializa a variável botao_salvar_clicado como False
     # Variável para rastrear se o mouse está pressionado
@@ -21,6 +14,7 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_sal
     branco = (255, 255, 255)
     preto = (0, 0, 0)
     vermelho = (255, 0, 0)
+    cor_texto = (0, 0, 0)
 
     fonte = pygame.font.Font(None, 36)
     largura, altura = 1920, 1080
@@ -38,9 +32,17 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_sal
     altura_botao_voltar = 80
     x_botao_voltar = x_botao_salvar - largura_botao_voltar - espaco_entre_botoes  # Separados por 60 pixels
     y_botao_voltar = y_botao_salvar
-    linhas = []
 
-    while estado_da_tela == "criar_percurso":
+
+    fonte = pygame.font.Font(None, 36)
+    texto = fonte.render('Digite o nome do trajeto:', True, cor_texto)
+    retangulo_texto = texto.get_rect(center=(largura // 2, 50))
+
+    input_retangulo = pygame.Rect(50, 100, 300, 40)
+    cor_input = pygame.Color('lightskyblue3')
+    input_texto = ''
+
+    while estado_da_tela == "salvar_percurso_tela":
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 pygame.quit()
@@ -54,32 +56,16 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_sal
                 # Verifique se o clique foi no botão "Salvar"
                 if pygame.Rect(x_botao_salvar, y_botao_salvar, largura_botao_salvar, altura_botao_salvar).collidepoint(evento.pos):
                     botao_salvar_clicado = True  # Ativar o efeito de clique
-                    estado_da_tela = "salvar_percurso_tela"
-                    ir_para_salvar()
                 # Verifique se o clique foi no botão "Voltar"
                 elif pygame.Rect(x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar).collidepoint(evento.pos):
                     estado_da_tela = "menu"  # Retorna à tela anterior (menu)
                     voltar_ao_menu()
+                # Botão "Salvar" na parte inferior da tela
 
-        # Desenhar o percurso enquanto o mouse está pressionado
-        if mouse_pressionado:
-            pos_mouse = pygame.mouse.get_pos()
-            if area_desenho.collidepoint(pos_mouse):
-                pontos_desenhados.append(pos_mouse)
-                if len(pontos_desenhados)>= 2:
-                    linhas.append((pontos_desenhados[-1], pontos_desenhados[-2]))
-
-        # Preencha a área de desenho com branco
         tela.fill(branco, area_desenho)
-
-        # Desenhe os pontos em vermelho
-        for ponto in pontos_desenhados:
-            pygame.draw.circle(tela, vermelho, ponto, 5)            
-
-        for i in linhas:
-            pygame.draw.line(tela, vermelho, i[-2], i[-1], 4)            
-
-        # Botão "Salvar" na parte inferior da tela
+        pygame.draw.rect(tela, cor_input, input_retangulo)
+        tela.blit(texto, retangulo_texto)
+        
         cor_botao_salvar = preto if botao_salvar_clicado else (100, 100, 100)  # Cor mais escura quando clicado
         pygame.draw.rect(tela, cor_botao_salvar, (x_botao_salvar, y_botao_salvar, largura_botao_salvar, altura_botao_salvar), border_radius=20)
         texto_salvar = fonte.render("Salvar", True, branco)
@@ -92,5 +78,35 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_sal
         texto_voltar_rect = texto_voltar.get_rect(center=(x_botao_voltar + largura_botao_voltar // 2, y_botao_voltar + altura_botao_voltar // 2))
         tela.blit(texto_voltar, texto_voltar_rect)
 
-        # Atualize a tela
+
         pygame.display.flip()
+
+                # Lógica para salvar o trajeto quando o botão "Salvar" é clicado
+        if botao_salvar_clicado:
+            # escolher_nome(pontos_desenhados)
+
+            botao_salvar_clicado = False
+
+def salvar_trajeto(trajeto, nome):
+    # Certifique-se de que a pasta "trajetos" existe ou a crie
+    if not os.path.exists("trajetos"):
+        os.mkdir("trajetos")
+
+    # Crie um nome de arquivo único usando UUID
+    nome_arquivo = os.path.join("trajetos", f"trajeto"+nome+ ".csv")
+
+    # Salva os pontos do trajeto no arquivo CSV
+    with open(nome_arquivo, mode='w', newline='') as arquivo_csv:
+        writer = csv.writer(arquivo_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(["X", "Y"])  # Cabeçalho do CSV
+        for ponto in trajeto:
+            writer.writerow([ponto[0], ponto[1]])
+
+def escolher_nome(trajeto):
+    # root = tk.Tk()
+    # root.withdraw()  # Esconde a janela principal
+
+    # # Pede ao usuário para inserir o nome do trajeto
+    # nome_trajeto = simpledialog.askstring("Nome do Trajeto", "Digite o nome do trajeto:")
+    # salvar_trajeto(trajeto, nome_trajeto)
+    print("a")
