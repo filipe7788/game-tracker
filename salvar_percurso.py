@@ -1,112 +1,87 @@
 import pygame
 import os, csv, sys
+from caixa_de_texto import CaixaDeTexto
+import pickle
 
 def salvar_percurso_tela(tela, estado_da_tela, trajeto_selecionado, voltar_ao_menu):
 
 
-    botao_salvar_clicado = False  # Inicializa a variável botao_salvar_clicado como False
-    # Variável para rastrear se o mouse está pressionado
-    mouse_pressionado = False
-
-    espaco_entre_botoes = 60
-
-    # Cores
-    branco = (255, 255, 255)
-    preto = (0, 0, 0)
-    vermelho = (255, 0, 0)
-    cor_texto = (0, 0, 0)
-
-    fonte = pygame.font.Font(None, 36)
     largura, altura = 1920, 1080
-    area_desenho = pygame.Rect(0, 0, largura, altura - 200)  # Área acima do botão "Salvar"
+    tela = pygame.display.set_mode((largura, altura))
+    pygame.display.set_caption('Caixa de Diálogo')
 
-
-    # Área do botão "Salvar"
-    largura_botao_salvar = 200
-    altura_botao_salvar = 80
-    x_botao_salvar = ((largura - largura_botao_salvar) // 2) + 120  # Centralizado na largura da tela
-    y_botao_salvar = altura - altura_botao_salvar - 60  # 60 pixels da margem inferior
-
-    # Área do botão "Voltar"
-    largura_botao_voltar = 200
-    altura_botao_voltar = 80
-    x_botao_voltar = x_botao_salvar - largura_botao_voltar - espaco_entre_botoes  # Separados por 60 pixels
-    y_botao_voltar = y_botao_salvar
-
+    cor_fundo = (255, 255, 255)
+    cor_texto = (0, 0, 0)
+    cor_borda = (0, 0, 0)
 
     fonte = pygame.font.Font(None, 36)
-    texto = fonte.render('Digite o nome do trajeto:', True, cor_texto)
-    retangulo_texto = texto.get_rect(center=(largura // 2, 50))
 
-    input_retangulo = pygame.Rect(50, 100, 300, 40)
-    cor_input = pygame.Color('lightskyblue3')
-    input_texto = ''
+    textos = ["Digite o nome do trajeto:", "Digite a quantidade de tempo que o indicador deverá se mover entre 2 pontos:", "Digite a quantidade de tempo que o indicador deverá passar em cada ponto:"]
+    caixas_de_texto = [CaixaDeTexto(largura // 2 - 300, altura // 2 - 36 - i * 200, 600, 72, fonte, cor_texto, cor_borda) for i in range(3)]
+    ativo = 0  # Começa com o primeiro campo ativo
+    
+    botao_confirmar = pygame.Rect(largura // 2 - 100, altura - 200, 200, 80)
+    cor_botao = pygame.Color('dodgerblue2')
+
 
     while estado_da_tela == "salvar_percurso_tela":
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1 and area_desenho.collidepoint(evento.pos):
-                # Inicia o desenho ao pressionar o botão esquerdo do mouse dentro da área de desenho
-                mouse_pressionado = True
-            elif evento.type == pygame.MOUSEBUTTONUP and evento.button == 1:
-                # Finaliza o desenho ao soltar o botão esquerdo do mouse
-                mouse_pressionado = False
-                # Verifique se o clique foi no botão "Salvar"
-                if pygame.Rect(x_botao_salvar, y_botao_salvar, largura_botao_salvar, altura_botao_salvar).collidepoint(evento.pos):
-                    botao_salvar_clicado = True  # Ativar o efeito de clique
-                # Verifique se o clique foi no botão "Voltar"
-                elif pygame.Rect(x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar).collidepoint(evento.pos):
-                    estado_da_tela = "menu"  # Retorna à tela anterior (menu)
-                    voltar_ao_menu()
-                # Botão "Salvar" na parte inferior da tela
-
-        tela.fill(branco, area_desenho)
-        pygame.draw.rect(tela, cor_input, input_retangulo)
-        tela.blit(texto, retangulo_texto)
-        
-        cor_botao_salvar = preto if botao_salvar_clicado else (100, 100, 100)  # Cor mais escura quando clicado
-        pygame.draw.rect(tela, cor_botao_salvar, (x_botao_salvar, y_botao_salvar, largura_botao_salvar, altura_botao_salvar), border_radius=20)
-        texto_salvar = fonte.render("Salvar", True, branco)
-        texto_salvar_rect = texto_salvar.get_rect(center=(x_botao_salvar + largura_botao_salvar // 2, y_botao_salvar + altura_botao_salvar // 2))
-        tela.blit(texto_salvar, texto_salvar_rect)
-
-        # Botão "Voltar" ao lado do botão "Salvar"
-        pygame.draw.rect(tela, preto, (x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar), border_radius=20)
-        texto_voltar = fonte.render("Voltar", True, branco)
-        texto_voltar_rect = texto_voltar.get_rect(center=(x_botao_voltar + largura_botao_voltar // 2, y_botao_voltar + altura_botao_voltar // 2))
-        tela.blit(texto_voltar, texto_voltar_rect)
+                executando = False
+            elif evento.type == pygame.MOUSEBUTTONDOWN:
+                if botao_confirmar.collidepoint(evento.pos) and ativo < len(textos):
+                    if ativo == 0:
+                        nome_trajeto = caixas_de_texto[ativo].texto
+                    elif ativo == 1:
+                        tempo1 = caixas_de_texto[ativo].texto
+                    elif ativo == 2:
+                        tempo2 = caixas_de_texto[ativo].texto
+                        salvar_trajeto(nome_trajeto, tempo1, tempo2, trajeto_selecionado)
+                    ativo += 1
+                    if ativo == len(textos):
+                        estado_da_tela = "menu"  # Retorna à tela anterior (menu)
+                        voltar_ao_menu()
+            tela.fill(cor_fundo)
 
 
-        pygame.display.flip()
+            for i, (texto, caixa) in enumerate(zip(textos, caixas_de_texto)):
+                retangulo_texto = fonte.render(texto, True, cor_texto)
+                # Calcula a posição para alinhar à direita
+                pos_x = largura // 2 - retangulo_texto.get_width() // 2
+                pos_y = altura // 2 - 90 - i * 200
+                tela.blit(retangulo_texto, (pos_x, pos_y))
 
-                # Lógica para salvar o trajeto quando o botão "Salvar" é clicado
-        if botao_salvar_clicado:
-            # escolher_nome(pontos_desenhados)
 
-            botao_salvar_clicado = False
+                caixa.update(evento)
+                caixa.renderizar(tela)
 
-def salvar_trajeto(trajeto, nome):
-    # Certifique-se de que a pasta "trajetos" existe ou a crie
-    if not os.path.exists("trajetos"):
-        os.mkdir("trajetos")
+            pygame.draw.rect(tela, cor_botao, botao_confirmar)
+            pygame.draw.rect(tela, cor_texto, botao_confirmar, 2)
 
-    # Crie um nome de arquivo único usando UUID
-    nome_arquivo = os.path.join("trajetos", f"trajeto"+nome+ ".csv")
+            texto_botao = fonte.render("Confirmar", True, cor_texto)
+            retangulo_botao_pos = texto_botao.get_rect(center=botao_confirmar.center)
+            tela.blit(texto_botao, retangulo_botao_pos)
 
-    # Salva os pontos do trajeto no arquivo CSV
-    with open(nome_arquivo, mode='w', newline='') as arquivo_csv:
-        writer = csv.writer(arquivo_csv, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(["X", "Y"])  # Cabeçalho do CSV
-        for ponto in trajeto:
-            writer.writerow([ponto[0], ponto[1]])
+            pygame.display.flip()
 
-def escolher_nome(trajeto):
-    # root = tk.Tk()
-    # root.withdraw()  # Esconde a janela principal
 
-    # # Pede ao usuário para inserir o nome do trajeto
-    # nome_trajeto = simpledialog.askstring("Nome do Trajeto", "Digite o nome do trajeto:")
-    # salvar_trajeto(trajeto, nome_trajeto)
-    print("a")
+def salvar_trajeto(nome_trajeto, tempo1, tempo2, trajeto):
+    result = [] 
+    for i in trajeto: 
+        if i not in result: 
+            result.append(i) 
+            
+    objeto_trajeto = {
+        "nome_trajeto": nome_trajeto,
+        "tempo_medio": tempo1,
+        "tempo_stay": tempo2,
+        "trajeto": result
+    }
+
+    pasta_trajetos = "trajetos"
+    if not os.path.exists(pasta_trajetos):
+        os.makedirs(pasta_trajetos)
+
+    caminho_arquivo = os.path.join(pasta_trajetos, f"{nome_trajeto}.pkl")
+    with open(caminho_arquivo, "wb") as arquivo:
+        pickle.dump(objeto_trajeto, arquivo)

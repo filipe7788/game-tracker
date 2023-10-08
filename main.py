@@ -2,7 +2,6 @@ import pygame
 import sys
 from criar_percurso import exibir_criar_percurso_tela
 from lista_de_percursos import exibir_lista_de_percursos
-from reproducao_de_percurso import exibir_trajeto_selecionado_tela
 from diagnostico import exibir_diagnostico_tela
 from salvar_percurso import salvar_percurso_tela
 
@@ -31,6 +30,8 @@ percurso_selecionado = None  # Armazena o percurso selecionado
 
 # Variável para armazenar o trajeto selecionado
 trajeto_selecionado = []
+
+objeto_percurso = None
 
 def voltar_para_lista():
     global estado_da_tela
@@ -73,8 +74,9 @@ def voltar_ao_menu():
     global estado_da_tela
     estado_da_tela = "menu"
 
-def ir_para_salvar():
-    global estado_da_tela
+def ir_para_salvar(trajeto):
+    global estado_da_tela, trajeto_selecionado
+    trajeto_selecionado = trajeto
     estado_da_tela = "salvar_percurso_tela"
 
 # Função para exibir a tela de criação de percurso
@@ -84,9 +86,9 @@ def exibir_criar_percurso():
 
 
 def selecionar_percurso(trajeto_selecionado_lista):
-    global trajeto_selecionado, estado_da_tela
+    global objeto_percurso, estado_da_tela
     estado_da_tela = "trajeto_selecionado"
-    trajeto_selecionado = trajeto_selecionado_lista
+    objeto_percurso = trajeto_selecionado_lista
 
 def ir_para_diagnostico(track):
     global estado_da_tela, track_geral
@@ -98,11 +100,6 @@ def exibir_percursos():
     global estado_da_tela, lista_de_percursos, percurso_selecionado
     exibir_lista_de_percursos(tela, estado_da_tela, selecionar_percurso, voltar_ao_menu)
 
-# Função para exibir o trajeto selecionado com um círculo percorrendo-o
-def exibir_trajeto_selecionado():
-    global tela, estado_da_tela, trajeto_selecionado
-    exibir_trajeto_selecionado_tela(estado_da_tela, tela, trajeto_selecionado, voltar_para_lista, ir_para_diagnostico)
-
 def exibir_diagnostico(): 
     global tela, estado_da_tela, track_geral
     exibir_diagnostico_tela(estado_da_tela, tela, voltar_ao_menu, track_geral)
@@ -110,6 +107,8 @@ def exibir_diagnostico():
 def exibir_salvar_trajeto():
     global tela, estado_da_tela, trajeto_selecionado
     salvar_percurso_tela(tela, estado_da_tela, trajeto_selecionado, voltar_ao_menu)
+
+from TelaExibirPercurso import TelaExibirPercurso
 
 # Loop principal
 while True:
@@ -120,7 +119,8 @@ while True:
     elif estado_da_tela == "percursos":
         exibir_percursos()
     elif estado_da_tela == "trajeto_selecionado":
-        exibir_trajeto_selecionado()
+        percurso = TelaExibirPercurso(objeto_percurso)
+        percurso.executar()
     elif estado_da_tela == "diagnostico":
         exibir_diagnostico()
     elif estado_da_tela == "salvar_percurso_tela":

@@ -55,7 +55,7 @@ def exibir_criar_percurso_tela(tela, estado_da_tela, voltar_ao_menu, ir_para_sal
                 if pygame.Rect(x_botao_salvar, y_botao_salvar, largura_botao_salvar, altura_botao_salvar).collidepoint(evento.pos):
                     botao_salvar_clicado = True  # Ativar o efeito de clique
                     estado_da_tela = "salvar_percurso_tela"
-                    ir_para_salvar()
+                    ir_para_salvar(pontos_desenhados)
                 # Verifique se o clique foi no botão "Voltar"
                 elif pygame.Rect(x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar).collidepoint(evento.pos):
                     estado_da_tela = "menu"  # Retorna à tela anterior (menu)

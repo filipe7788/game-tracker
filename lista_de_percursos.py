@@ -1,7 +1,7 @@
 import pygame
 import os
 import sys
-
+import pickle
 # Função para exibir a tela de percursos
 def exibir_lista_de_percursos(tela, estado_da_tela, selecionar_percurso, voltar_ao_menu):
        # Cores
@@ -21,11 +21,7 @@ def exibir_lista_de_percursos(tela, estado_da_tela, selecionar_percurso, voltar_
     lista_retangulos_percursos = []  # Lista de retângulos clicáveis dos percursos
     percurso_selecionado = None  # Armazena o percurso selecionado
 
-    for arquivo in os.listdir("trajetos"):
-        if arquivo.endswith(".csv"):
-            lista_de_percursos.append(arquivo)
-
-
+    lista_de_percursos = carregar_trajetos()
     # Preencha a tela com branco
     tela.fill(branco)
     largura_botao_voltar = 200
@@ -46,7 +42,6 @@ def exibir_lista_de_percursos(tela, estado_da_tela, selecionar_percurso, voltar_
                             percurso_selecionado = i
                             estado_da_tela = "trajeto_selecionado"  # Mude para a tela de trajeto selecionado
                             selecionar_percurso(lista_de_percursos[i])
-
                             break
                     if pygame.Rect(x_botao_voltar, y_botao_voltar, largura_botao_voltar, altura_botao_voltar).collidepoint(evento.pos):
                         estado_da_tela = "menu"  # Retorna à tela anterior (menu)
@@ -68,9 +63,24 @@ def exibir_lista_de_percursos(tela, estado_da_tela, selecionar_percurso, voltar_
             pygame.draw.rect(tela, preto, retangulo, border_radius=20)
 
             # Nome do arquivo (sem a extensão .csv)
-            nome_arquivo = os.path.splitext(arquivo)[0]
+            nome_arquivo = arquivo["nome_trajeto"]
             texto_percurso = fonte.render(nome_arquivo, True, branco)
             tela.blit(texto_percurso, (50, 115 + i * 60))
 
         # Atualize a tela
         pygame.display.flip()
+
+
+def carregar_trajetos():
+    pasta_trajetos = "trajetos"
+    trajetos = []
+
+    if os.path.exists(pasta_trajetos):
+        for arquivo in os.listdir(pasta_trajetos):
+            if arquivo.endswith(".pkl"):
+                caminho_arquivo = os.path.join(pasta_trajetos, arquivo)
+                with open(caminho_arquivo, "rb") as arquivo_trajeto:
+                    trajeto = pickle.load(arquivo_trajeto)
+                    trajetos.append(trajeto)
+
+    return trajetos
